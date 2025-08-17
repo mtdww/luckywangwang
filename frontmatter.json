@@ -1,0 +1,92 @@
+{
+  "$schema": "https://frontmatter.codes/frontmatter.schema.json",
+  "frontMatter.taxonomy.contentTypes": [
+    {
+      "name": "default",
+      "pageBundle": false,
+      "previewPath": null,
+      "fields": [
+        {
+          "title": "Title",
+          "name": "title",
+          "type": "string",
+          "default": ""
+        },
+        {
+          "title": "Author",
+          "name": "author",
+          "type": "string",
+          "default": "迷途的汪汪"
+        },
+        {
+          "title": "Description",
+          "name": "description",
+          "type": "string"
+        },
+        {
+          "title": "Publishing date",
+          "name": "pubDatetime",
+          "type": "datetime",
+          "default": "{{now}}",
+          "isPublishDate": true
+        },
+        {
+          "title": "Last modified date",
+          "name": "modDatetime",
+          "type": "datetime",
+          "default": "{{now}}",
+          "isModifiedDate": true
+        },
+        {
+          "title": "Content preview",
+          "name": "preview",
+          "type": "image"
+        },
+        {
+          "title": "Is in draft",
+          "name": "draft",
+          "type": "draft"
+        },
+        {
+          "title": "Feature",
+          "name": "feature",
+          "type": "boolean"
+        },
+        {
+          "title": "Slug",
+          "name": "slug",
+          "type": "string"
+        },
+        {
+          "title": "Tags",
+          "name": "tags",
+          "type": "tags"
+        },
+        {
+          "title": "Categories",
+          "name": "categories",
+          "type": "categories"
+        }
+      ]
+    }
+  ],
+  "frontMatter.framework.id": "astro",
+  "frontMatter.preview.host": "http://localhost:4321",
+  "frontMatter.content.publicFolder": "public",
+  "frontMatter.content.pageFolders": [
+    {
+      "path": "[[workspace]]/src/data/blog/technology"
+    },
+    {
+      "path": "[[workspace]]/src/data/blog/life"
+    },
+    {
+      "path": "[[workspace]]/src/data/blog/books"
+    },
+    {
+      "title": "pages",
+      "path": "[[workspace]]/src/pages"
+    }
+  ],
+  "frontMatter.git.enabled": true
+}

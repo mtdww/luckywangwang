@@ -1,5 +1,5 @@
 export const SITE = {
-  website: "https://astro-paper.pages.dev/", // replace this with your deployed domain
+  website: "https://lostwangwang.xyz/", // replace this with your deployed domain
   author: "迷途的汪汪",
   profile: "",
   desc: "我们反抗命运唯一的武器，就是我们自己。",
