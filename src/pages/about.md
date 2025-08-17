@@ -13,5 +13,5 @@ Now I’m currently learning LLM, Vue, Go.
 
 - Music
 - Running
-- Bicycle(GIANT 860)
+- Riding
 - Reading
