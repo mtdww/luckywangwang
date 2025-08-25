@@ -49,7 +49,7 @@
         },
         {
           "title": "Feature",
-          "name": "feature",
+          "name": "featured",
           "type": "boolean"
         },
         {

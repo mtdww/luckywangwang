@@ -4,7 +4,7 @@ pubDatetime: 2025-07-14T12:00:00Z
 modDatetime: 2025-07-15T12:00:00Z
 title: git学习记录
 slug: git_learning_record
-featured: true
+featured: false
 draft: false
 tags:
   - Git
