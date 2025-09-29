@@ -6,6 +6,12 @@ git commit -m "[介绍，随便写点什么，比如日期]"
 git push -u origin main
 ```
 
+### 本地运行
+
+```shell
+pnpm run dev
+```
+
 # AstroPaper 📄
 
 ![AstroPaper](public/astropaper-og.jpg)
