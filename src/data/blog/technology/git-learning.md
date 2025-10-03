@@ -114,7 +114,14 @@ git switch -c <branch_name> # 创建并切换分支
 
 **注意**: 大部分情况下合并和 rebase 是可以互换的，但是如果分支已经提交给了远程仓库，那么这时尽量不要变基
 
-## 5. 远程仓库
+## 5. 在wsl上查看git的安装路径
+
+```bash
+which git # 查看git的安装路径
+# 返回 /usr/bin/git
+```
+
+## 6. 远程仓库
 
 目前对于 `git` 所有操作都是在本地进行的。在开发中显然不能这样，这时我们需要一个远程的 `git` 仓库。远程的 git 仓库和本地的本质没有什么区别。不同点在于远程的仓库可以被多人同时访问使用，方便我们协同开发。在实际工作中，`git`的服务器通常由公司内部使用或是购买一些公共的私有`git`服务器。
 
@@ -137,6 +144,9 @@ git push -u origin main
 #### 远程库的命令
 
 ```bash
+# 显示当前远程信息
+git remote -v
+
 git remote # 列出当前的关联的远程库
 
 git remote add <远程库名> <远程库地址> # 添加远程库
@@ -158,7 +168,7 @@ git pull # 从服务器上拉取代码并自动合并
 
 > 注意: 推送代码之前，一定要先从远程库中拉去最新的代码
 
-## 6. tags
+## 7. tags
 
 - 当头指针没有指向某个分支的头部时，这种状态我们成为分离头指针 `HEAD detached` 在分离头指针的状态下，我们也可以操作代码，但是这些操作不会出现在在任何分支上，所以注意不要在分离头指针的状态下进行来操作仓库。
 - 如果非得要回到后边的节点对代码进行操作，则可以选择创建分支后再操作。
@@ -180,19 +190,169 @@ git tag -d <标签名> # 删除标签
 git push 远程仓库 --delete 标签名 # 删除远程标签
 ```
 
-## 7. gitignore
+## 8. gitignore
 
 - 默认情况下，git 会监视项目中所有内容。但是有些内容比如 `node_modules`目录中的内容，我们不希望它被`git`所管理。我们可以在项目目录中添加一个 `.gitignore`文件，来设置那些需要`git`忽略的内容。
 
-## 8. gh-pages
+## 9. gh-pages
 
 - 在 github 中，可以将自己的静态页面部署到 github 中，它会给我们提供一个地址使得我们的页面变成一个真正的网站，可以供用户访问。
 - 要求：
   - 要求静态页面的分支必须是 `gh-pages`
   - 如果希望页面可以通过 xxx.github.io,则需要将库名修改为 `xxx.github.io`
 
-## 9. Docusaurus
+## 10. Docusaurus
 
 > [Docusaurus](https://docusaurus.io/docs)
 
 `docusaurus.config.ts`: 配置文件
+
+## 11. git提交仓库的commit规范
+
+[]()
+
+## 问题解决
+
+1. 首次提交代码时，出现
+
+```shell
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: is subject to change. To configure the initial branch name to use in all
+hint: of your new repositories, which will suppress this warning, call:
+hint:
+hint:   git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint:   git branch -m <name> 这是什么原因
+```
+
+方法一: 只改当前仓库
+
+```shell
+git branch -m master main
+```
+
+方法二： 设置全局默认值(以后所有的新仓库都会用`main`)
+
+```shell
+git config --global init.defaultBranch main
+```
+
+2. 想让项目恢复“刚初始化状态”
+   > 想让本地仓库像刚`git init`一样(没有提交历史、没有分支、没有远程)，可以这样。
+   > 注意：这里删除所有Git历史记录，但是不会删除你的代码文件
+
+```shell
+# 1. 删除 .git 目录（里面存的是 Git 历史和配置）
+rm -rf .git
+# 2. 重新初始化仓库
+git init
+# 3. 重新添加并提交文件
+git add .
+git commit -m "Initial commit"
+
+```
+
+3. 如何查看被追踪的文件？
+
+```shell
+# 查看当前已追踪的文件列表，这个命令会列出Git索引(暂存区)中所有的文件，也就是被git追踪的文件。
+git ls-files
+
+# 查看详细状态(包括变更)
+git status
+# Changes to be committed：已暂存的追踪文件
+# Changes not staged for commit：已追踪但有修改的文件
+# Untracked files：未追踪的文件（.gitignore 中忽略的文件不会显示）
+
+# 只看已追踪但未暂存的修改
+# 会列出所有已追踪且有修改、但还没 git add 的文件。
+git diff --name-only
+
+# 只看已暂存的文件
+# 会列出已经 git add 过、等待 git commit 的文件。
+git diff --cached --name-only
+
+# 查看某个文件是否被追踪
+# 如果文件被追踪，会显示文件名，退出码为 0
+# 如果文件未被追踪，会报错，退出码为 1
+git ls-files --error-unmatch 文件名
+```
+
+4. 开发新分支
+
+4.1 确保本地仓库同步
+
+```bash
+# 切换到主分支
+git checkout main   # 或 master
+
+# 拉取最新代码
+git pull origin main
+```
+
+4.2 创建并切换到新分支
+
+```bash
+# 方法1：分开执行
+git branch feature/login
+git checkout feature/login
+
+# 方法2：一步到位
+git checkout -b feature/login
+```
+
+4.3 开发与提交
+
+```bash
+# 查看修改
+git status
+
+# 添加修改
+git add .
+
+# 提交代码
+git commit -m "feat: 实现登录功能"
+```
+
+4.4 推送新分支到远程仓库
+
+```bash
+# 第一次推送需要设置上游分支
+git push -u origin feature/login
+
+# 后续推送可直接使用
+git push
+```
+
+4.5 分支合并（开发完成后）
+
+```bash
+# 切回主分支
+git checkout main
+
+# 拉取最新代码
+git pull origin main
+
+# 合并分支
+git merge feature/login
+
+# 推送合并结果
+git push origin main
+```
+
+4.6 删除分支
+
+```bash
+# 删除本地分支
+git branch -d feature/login
+
+# 删除远程分支
+git push origin --delete feature/login
+```
+
+## 参考链接
+
+- [spoc-git-guidelines](https://github.com/random-guys/spoc-git-guidelines)
