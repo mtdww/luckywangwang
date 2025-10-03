@@ -2,7 +2,7 @@
 author: 迷途的汪汪
 pubDatetime: 2025-07-14T12:00:00Z
 modDatetime: 2025-07-15T12:00:00Z
-title: git学习记录
+title: Git入门笔记
 slug: git_learning_record
 featured: false
 draft: false
