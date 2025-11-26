@@ -8,8 +8,8 @@ preview: ""
 draft: true
 featured: false
 slug: ""
-tags: []
-categories: []
+tags: ["conda"]
+categories: ["python", "conda"]
 ---
 
 # python&conda&torch 命令记录
