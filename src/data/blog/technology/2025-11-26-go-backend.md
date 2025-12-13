@@ -15,6 +15,8 @@ categories: ["go", "backends"]
 ## 第一步: Go语言学习
 * 语法学习: [Go指南](https://tour.go-zh.org/welcome/1)
 
+#### 学习记录
+
 ## 第二步: 学习框架
 * gin框架: [gin框架](https://github.com/gin-gonic/gin)
 * gorm: [gorm](https://github.com/go-gorm/gorm)
