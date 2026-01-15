@@ -1,5 +1,5 @@
 ---
-title: first-research-trip
+title: 我的第一次科研
 author: 迷途的汪汪
 description: ""
 pubDatetime: 2026-01-15T03:32:32.302Z
@@ -11,3 +11,4 @@ slug: ""
 tags: []
 categories: []
 ---
+很不幸，第一次科研以失败告终。
