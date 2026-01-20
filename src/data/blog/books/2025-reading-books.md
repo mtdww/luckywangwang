@@ -4,7 +4,7 @@ pubDatetime: 2025-07-14T15:22:00Z
 modDatetime: 2025-07-15T12:00:00Z
 title: 2025年阅读记录
 slug: 2025-reading-books-record
-featured: true
+featured: false
 draft: false
 tags:
   - books
