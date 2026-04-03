@@ -1,5 +1,5 @@
 ---
-title: 正在捣鼓python虚拟环境的朋友们，请试试uv吧
+title: uv虚拟环境
 author: 迷途的汪汪
 description: ""
 pubDatetime: 2026-01-21T15:18:56.625Z
