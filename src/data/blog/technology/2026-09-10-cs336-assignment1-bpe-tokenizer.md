@@ -138,16 +138,20 @@ def _pretokenize_and_count(self, input_path: str | os.PathLike, special_tokens: 
 ```
 
 - 这里需要重点理解的代码
+
 ```python
 # 构造正则表达式，用于匹配特殊token，拼接成 token1|token2|token3 的形式，方便后续分割文本块
 special_pattern = '|'.join(re.escape(token) for token in special_tokens)
 ```
+
 _这块代码主要是我不理解，所以需要解释一下._
+
 1. `re.escape()` 的作用：**把字符串里所有正则特殊字符转义**,`|`在正则中表示`或`的意思, `re.escape("<|endoftext|>")` → `\<\|endoftext\|\>`,防止特殊 token 里面本身含有正则符号，把正则表达式搞崩。
 2. `'|'.join(...)` 这块代码是`|`在正则中表示OR，用来把多个转义后的token用`|`拼接，构成多选一的规则。
 3. 举个例子，`"Today is good<|endoftext|>Hello world<|bos|>Test"`, `special_tokens = special_tokens = ["<|endoftext|>", "<|bos|>"]`, 我们可以直接切开为`['Today is good', 'Hello world', 'Test']`
 
 - 第二个代码我需要理解的部分
+
 ```python
 for block in blocks:
     # 使用正则匹配基础符号，并统计每个符号的频率
@@ -155,10 +159,12 @@ for block in blocks:
         text = match.group(0)
         word_counts[text] += 1
 ```
+
 1. 官方推荐使用`re.finditer`: **迭代器，找出当前 block 里所有匹配 pattern 的子串**，不会一次性生成全部列表，内存更友好。
 2. 和`re.findall`区别：findall 直接返回字符串列表；finditer 返回匹配对象迭代器。
 
 ##### 2. 实现`_chunk_documents_streaming`方法
+
 ```python
 @staticmethod
     def _chunk_documents_streaming(input_path: str | os.PathLike, chunk_size: int = CHUNK_SIZE, special_tokens: list[str] = ["<|endoftext|>"]):
@@ -205,17 +211,22 @@ for block in blocks:
 ```
 
 ### 3. BPE合并
+
 举例:
+
 - `word = "hello"`，`count = 120`（这个预分词片段在语料出现 120 次）
 - `word_encodings["hello"] = [104,101,108,108,111]`
-遍历相邻对：
-`(104,101)`, `(101,108)`, `(108,108)`, `(108,111)`
-每一对都 `pair_counts[pair] += 120`
+  遍历相邻对：
+  `(104,101)`, `(101,108)`, `(108,108)`, `(108,111)`
+  每一对都 `pair_counts[pair] += 120`
+
 ##### 1. 实现`_count_pairs`方法
+
 - 举例`vocabulary, word_counts, word_encodings, pair_strings`，需要了解它们都存的什么
-Byte BPE，基础字节 id 0~256，这里简化，只用少量 id 演示
-" hello" 出现 5次
-"hi" 出现 2次
+  Byte BPE，基础字节 id 0~256，这里简化，只用少量 id 演示
+  " hello" 出现 5次
+  "hi" 出现 2次
+
 ```python
 # 1. vocabulary
 `vocabulary`: token_id(int) → token_bytes(bytes)，
@@ -246,7 +257,9 @@ word_encodings = {
 # key 是 pair 元组`(token_id1, token_id2)`，value 是一对字节。
 
 ```
+
 ###### 代码实现
+
 ```python
 import collections
 
@@ -287,7 +300,7 @@ def _count_pairs(self, vocabulary, word_counts, word_encodings, pair_strings):
                 # vocabulary[pair[1]]：第二个id对应的bytes
                 # 把两个字节存入pair_strings缓存：pair元组 → (字节串1,字节串2)
                 # 后续合并pair的时候直接读取，不用反复查表，减少重复计算
-                # bytes_a = vocabulary[pair[0]], bytes_b = vocabulary[pair[1]] 
+                # bytes_a = vocabulary[pair[0]], bytes_b = vocabulary[pair[1]]
                 # 所以这里就相当于存的是 原始`bytes`字节串
                 # `pair_strings[(108,108)] = (b'l', b'l')`
                 pair_strings[pair] = (vocabulary[pair[0]], vocabulary[pair[1]])
@@ -297,7 +310,9 @@ def _count_pairs(self, vocabulary, word_counts, word_encodings, pair_strings):
 ```
 
 ##### 2. train代码
+
 > 从第三步开始看
+
 1. 第一个问题: 为什么要`size < self.vocab_size`呢
 
 `size` 代表**当前词表里一共有多少个 token**。每一轮 while 循环，我们**新增 1 个 token**，`size = size + 1`。
@@ -308,6 +323,7 @@ def _count_pairs(self, vocabulary, word_counts, word_encodings, pair_strings):
 - 目标：词表最终一共要有 260 个 token。
 - 现在 size=257，小于 260 → 进入循环。
 - 第一轮循环: 统计pair，选出最高频pair, 合并生成1个全新token->`vocabulary[size] = merge_bytes` → vocabulary [257] = 新子词 ->new_token_id = size -> `size +=1` → size 变成 258
+
 2. `merge_pair, max_count = max(pair_counts.items(), key=lambda x: (x[1], pairs_strings[x[0]]))`这一行代码的原理
 
 - 首先，`pair_counts`存储的是`{(id1,id2): 出现频次}`, `pair_counts.items()` → 迭代器，每一项是 `(pair元组, count)`，形如 `((108,108), 120)`
@@ -320,20 +336,24 @@ def _count_pairs(self, vocabulary, word_counts, word_encodings, pair_strings):
   - (A, B)比较的时候：
     - 先比较第一个元素A；A大，整体就大
     - 如果A想等，再比较第二个元素B，用来做稳定排序、打破平局。
+
 3. 我不知道为什么预分词片段的编码序列要更新？
-更新word_encodings，是为了让下一轮循环能够在【新的 token 序列】里继续找更长的子词。
-举例子:
+   更新word_encodings，是为了让下一轮循环能够在【新的 token 序列】里继续找更长的子词。
+   举例子:
+
 ```python
 word_encodings["hello"] = [104, 101, 108, 108, 111]
 # 104:h,101:e,108:l,111:o
 ```
+
 本轮选出的最高频的merge_pair=(108,108)，新的id=257，对应字节`b'll'`
 不更新的话，`word_encodings["hello"]` 仍然是 `[104,101,108,108,111]`,下一轮调用`_count_pairs`统计相邻 pair，依然识别成：, `(104,101), (101,108), (108,108), (108,111)`,永远看不到 `(101,257)` 这个新 pair（`e + ll`）。
 
 更新的操作是, 扫描`[104, 101, 108, 108, 111]`,发现`(108,108)`，替换成新 id `257`, 现在的序列变成了`h e ll o`, 下一轮的统计pair，会产生新的pair: (104, 101), (101, 257), (257, 111), 现在就有机会合并(101, 257)，也就是 `e + ll = ell`
+
 ```python
 def train(self):
-        
+
         # -------- 第一步: 初始化词表: 基础单元是全部256个字节(0-255)，再加上特殊token
         # {i: bytes([i]) for i in range(BYTES_NUM)}
         # BYTES_NUM一般 = 256，对应所有ASCII/utf8基础单字节
@@ -342,7 +362,7 @@ def train(self):
         # 把特殊token加入词表，特殊token的id从BYTES_NUM开始
         for i, sp_token in enumerate(self.special_tokens):
             vocabulary[BYTES_NUM + i] = sp_token.encode("utf8")
-        
+
         # 当前词表总大小 = 256 + len(special_tokens)
         size = BYTES_NUM + len(self.special_tokens)
 
